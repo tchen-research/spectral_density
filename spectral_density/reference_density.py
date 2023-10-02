@@ -5,7 +5,7 @@ from .lanczos import *
 # default number of recurrence coefficients to generate
 _default_degree = 1000
 
-# TODO: number of coefficient adaptively? I.e. store iterators fpr coefficients rather than a list?
+# TODO: number of coefficient adaptively? I.e. store iterators for coefficients rather than a list?
 class reference_density:
 
     def __init__(self,σ,γδ,mass=1):
@@ -159,6 +159,63 @@ def combine_densities(densities):
 
     return reference_density(σ,(γ,δ),mass)
 
+
+def get_jacobi_density(a,b,α=-.5,β=-.5,k=_default_degree):
+    r"""
+    Return reference_density object for Jacobi distribution with parameters \((\alpha,\beta)\) on \([a,b]\):
+
+    \[\sigma(x) = c_0 \left(\frac{2}{b-a}\right)^{\alpha+\beta+1} (x-a)^{\beta}(b-x)^{\alpha} \]
+    where 
+    \[
+    c_0 = \frac{_2F_1(1,-a,2+b,-1)}{1+b}+ \frac{_2F_1(1,-b,2+a,-1)}{1+a}
+    \]
+
+    Note: this is the unit-mass orthogonality measure for the Jacobi polynomials with parameters \((\alpha,\beta)\) shifted and scaled to \([a,b]\).
+
+
+    Parameters
+    ----------
+    a : float
+    b : float
+    k : int
+        maximum number of coefficients
+
+    Returns
+    -------
+    reference_density
+        arcsin density
+    """
+
+    def σ(x):
+        c0 = sp.special.hyp2f1(1,-α,2+β,-1)/(1+β) + sp.special.hyp2f1(1,-β,2+α,-1)/(1+α)
+        supp = (x>a)*(x<b)
+        return (2/(b-a))**(α+β+1)*(1/c0)*((x-a)*supp+(1-supp))**β*((b-x)*supp+(1-supp))**α*supp
+
+    def γn(n):
+        if n==0:
+            return (β-α)/(α+β+2)
+        else:
+            return (β**2 - α**2)/((2*n + α + β + 2)*(2*n + α + β))
+    
+    def δn(n):
+        if α+β==-1 and n==0:
+            return np.sqrt(2*α*β)
+        else:
+            return 2*np.sqrt(n+1)*np.sqrt(n+α+1)*np.sqrt(n+β+1)*np.sqrt(n+α+β+1)/\
+            ((2*n + α + β + 2)*np.sqrt(2*n + α + β + 3)*np.sqrt(2*n + α + β + 1))
+
+    print(γn(0))
+    γ = np.full(k,np.nan)
+    δ = np.full(k,np.nan)
+    
+    for n in range(k):
+        γ[n] = γn(n) * (b-a)/2 + (a+b)/2
+        δ[n] = δn(n) * (b-a)/2
+
+    return reference_density(σ,(γ,δ))
+
+
+# the following are special cases of Jacobi distributions, but we have implemented them explicitly which might result in slightly better performance.
 
 def get_arcsin_density(a,b,k=_default_degree):
     r"""
