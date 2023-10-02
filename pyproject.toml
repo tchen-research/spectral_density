@@ -1,0 +1,31 @@
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.8.0,<4"]
+
+[project]
+name = "spectral_density"
+version = "0.1.0"
+authors = [
+    {name = "Tyler Chen", email = "tyler.chen@nyu.edu"},
+]
+description = "Spectrum adaptive spectral densities"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+]
+dependencies = [
+    "numpy>=1.17",
+    "scipy>=1.4"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/tchen-research/spectral_density"
+"Bug Tracker" = "https://github.com/tchen-reserach/spectral_density/issues"
+
